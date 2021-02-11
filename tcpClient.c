@@ -10,12 +10,42 @@
 
 // Easily change the port 
 #define PORT 9002
+#define LINE_SIZE 80
+
+// Packet Structure 
+struct packetHeader{
+    int count;
+    unsigned int packet_sequence_count;
+};
+
+struct hostent * server_hp;
+char server_hostname[LINE_SIZE];
+
+// Server Structure
+
+// Output file to write to
+FILE *output;
 
 int main(void){
     
     int socket_id;
     socket_id = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if(socket_id < 0){
+        perror("Client: Socket cannot be opened \n");
+        exit(1);
+    }
 
+    output = fopen("output_result.txt", "w");
+
+    printf("Enter Hostname of the Server: \n");
+    scanf("%s", server_hostname);
+
+    if((server_hp = gethostbyname(server_hostname)) == NULL){
+        perror("Error: Hostname could not be reached");
+        close(socket_id);
+        exit(1);
+    }
+    
     // Specifiy an address for the socket
     struct sockaddr_in server_address;
     server_address.sin_family = PF_INET;
